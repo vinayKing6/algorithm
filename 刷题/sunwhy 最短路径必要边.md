@@ -1,0 +1,12 @@
+---
+tags:
+  - dijkstra
+  - graph
+  - 最短路
+  - mid
+date: 2026-03-14
+练习次数: 1
+---
+https://sunnywhy.com/camp/3415/model/3613?itemId=4200
+
+很妙啊!!!

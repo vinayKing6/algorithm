@@ -1,0 +1,10 @@
+{
+  "interfaceFontFamily": "Code New Roman",
+  "textFontFamily": "Code New Roman",
+  "monospaceFontFamily": "Code New Roman",
+  "baseFontSize": 26,
+  "theme": "system",
+  "baseFontSizeAction": true,
+  "translucency": false,
+  "cssTheme": "GitHub Theme"
+}
