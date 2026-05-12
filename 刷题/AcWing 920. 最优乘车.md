@@ -3,7 +3,7 @@ tags:
   - graph
   - 最短路
   - mid
-date: 2026-05-08
+date: 2026-05-12
 练习次数: 1
 ---
 # 题目
@@ -50,4 +50,86 @@ H 城是一个旅游胜地，每年都有成千上万的人前来观光。
 
 ```
 2
+```
+
+
+# 思路
+
+可以使用bfs的思想，比如6->7，那么6到7乘坐一辆车，即建一条6->7的权重为1的有向边，4->7->3->6就相当于4->7,4->3,4->6,7->3,7->6,3->6都只需坐一趟车，所以找到起点到终点的最短路可以用bfs，最后换乘车辆就是乘坐车辆数减一，难点是建图
+
+![[d3cd5224b23acff896a18c689d6454f3.jpg]]
+
+# 代码
+
+```c++
+#include<bits/stdc++.h> // 包含所有标准库的头文件
+using namespace std;
+
+const int N = 510;      // 最大站点数量
+int m, n;               // m: 公交线路数, n: 站点总数
+int stop[N];            // 临时存储每条公交线路中的所有站点
+int dist[N];            // 存储从起点（1号站）到各站的最少乘车次数
+int g[N][N];            // 邻接矩阵，g[u][v] = 1 表示从 u 站可以直达 v 站
+queue<int> q;           // BFS 使用的标准队列
+
+// 广度优先搜索 (BFS) 计算从 1 号站出发的最短路径
+void bfs(){
+    // 将所有距离初始化为无穷大 (0x3f3f3f3f)
+    memset(dist, 0x3f, sizeof dist);
+    dist[1] = 0;        // 起点到自身的乘车次数为 0
+    q.push(1);          // 起点入队
+    
+    while(!q.empty()){
+        int u = q.front();
+        q.pop();
+        
+        // 遍历所有可能的下一个站点 v
+        for(int v = 1; v <= n; v++){
+            // 如果 u 到 v 有直达车，且通过 u 到达 v 的次数更少
+            if(g[u][v] && dist[v] > dist[u] + 1){
+                dist[v] = dist[u] + 1; // 更新最少乘车次数
+                q.push(v);             // 发现更短路径，将 v 入队继续搜索
+            }
+        }
+    }
+}
+
+int main(){
+    // 读取线路数和站点数
+    cin >> m >> n;
+    
+    string line;
+    getline(cin, line); // 关键：吸收掉 cin>>n 之后残留在缓冲区的换行符
+    
+    while(m--){
+        getline(cin, line);      // 读取整行公交线路数据
+        stringstream ssin(line); // 使用字符串流解析这一行中的每一个数字
+        
+        int cnt = 0, idx;
+        while(ssin >> idx) stop[cnt++] = idx; // 将该线路的所有站点存入 stop 数组
+        
+        // 核心建图逻辑：
+        // 在同一条线路中，位于前面的站 i 可以直达位于后面的任意站 j
+        for(int i = 0; i < cnt; i++){
+            for(int j = i + 1; j < cnt; j++){
+                g[stop[i]][stop[j]] = 1; // 标记从 stop[i] 到 stop[j] 有直达路径
+            }
+        }
+    }
+    
+    bfs(); // 执行 BFS 搜索
+    
+    // 如果终点 n 的距离仍为初始的无穷大，说明无法到达
+    if(dist[n] == 0x3f3f3f3f) {
+        cout << "NO" << endl;
+    } 
+    else {
+        // dist[n] 是乘车次数，题目通常求“换乘次数”
+        // 换乘次数 = 乘车次数 - 1（例如坐 1 趟车，换乘 0 次）
+        // 使用 max 是为了防止 dist[n] 为 0 时出现负数
+        cout << max(dist[n] - 1, 0) << endl;
+    }
+    
+    return 0;
+}
 ```
