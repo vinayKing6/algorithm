@@ -2,8 +2,9 @@
 tags:
   - graph
   - 最小生成树
-  - easy
-date: 2026-05-15
+  - mid
+  - 贪心
+date: 2026-05-16
 练习次数: 1
 ---
 # 题目
@@ -61,4 +62,83 @@ date: 2026-05-15
 
 ```
 3 6
+```
+
+# 思路
+
+对比：[[AcWing 859. Kruskal算法求最小生成树]]
+
+这道题坑的是，我以为改造指的是去掉某条边，原来是加入某条边，那么就是一道模板题
+
+![[Pasted image 20260516200852.png]]
+
+# 代码
+
+```c++
+#include<bits/stdc++.h>
+using namespace std;
+
+// N为最大点数，M为最大边数
+const int N=310, M=8010;
+int n, m, p[N], res; // n点数, m边数, p并查集数组, res记录当前生成树中最大的边权
+
+// 定义边结构体
+struct Edge{
+    int a, b, c; // a, b 为端点，c 为边权
+};
+
+// 排序准则：按边权从小到大排序
+bool cmp(Edge e1, Edge e2){
+    return e1.c < e2.c;
+}
+
+Edge edges[M]; // 存储所有边的数组
+
+// 并查集核心操作：查找祖先节点 + 路径压缩
+int find(int x){
+    if(x != p[x])
+        p[x] = find(p[x]);
+    return p[x];
+}
+
+// Kruskal 算法主体
+void kruskal(){
+    for(int i=0; i<m; i++){
+        int pa = find(edges[i].a); // 查找起点所在的集合
+        int pb = find(edges[i].b); // 查找终点所在的集合
+        int c = edges[i].c;        // 当前边的权重
+        
+        // 如果两个点不在同一个集合，说明加入这条边不会形成环
+        if(pa != pb) {
+            p[pa] = pb; // 合并集合
+            res = c;    // 由于边已排序，最后加入树的边一定是当前已选边中权重最大的
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false); // 优化输入输出效率
+    cin >> n >> m;
+
+    // 初始化并查集，每个点的祖先初始为自己
+    for(int i=1; i<=n; i++) p[i] = i;
+
+    // 输入 m 条边
+    for(int i=0; i<m; i++){
+        cin >> edges[i].a >> edges[i].b >> edges[i].c;
+    }
+
+    // 1. 将所有边按权重从小到大排序（Kruskal 的核心步骤）
+    sort(edges, edges + m, cmp);
+
+    // 2. 执行 Kruskal 算法构建最小生成树
+    kruskal();
+
+    // 3. 输出结果
+    // n-1：生成树的边数（连通 n 个点最少需要 n-1 条边）
+    // res：最小生成树中最大边的权重
+    cout << n-1 << " " << res << endl;
+
+    return 0;
+}
 ```
